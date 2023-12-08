@@ -140,5 +140,4 @@ public class MessageEventHandler {
         return sa.substring(1, sa.indexOf(":"));
     }
 
-
 }

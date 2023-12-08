@@ -8,15 +8,15 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class HeadTransformation extends Transformation {
-    private Argument limit;
-    private Argument nullArg;
-    private Argument keeplast;
-    private List<String> functions;
-    private List<String> keywords;
-    private Integer intValue;
-    private Argument boolValue;
-    private List<String> andOrXorList;
-    private Argument field;
-    private Argument num;
-    private Argument string;
+
+    @Data
+    public static class HeadFunctions {
+        private Argument abs;
+        private Argument avg;
+        private Argument lookup;
+        private Argument trim;
+        private Argument num;
+        private Argument round;
+    }
+
 }

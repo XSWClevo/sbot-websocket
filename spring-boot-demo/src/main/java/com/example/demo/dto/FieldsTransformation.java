@@ -8,6 +8,14 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class FieldsTransformation extends Transformation {
-    private List<String> wcFieldList;
+//    { "key": "limit", "valueType": "int" },
+//    { "key": "null", "valueType": "bool" },
+//    { "key": "keeplast", "valueType": "bool" }
 
+    @Data
+    public static class FieldsArgs {
+        private Argument limit;
+        private Argument fnull;
+        private Argument keeplast;
+    }
 }

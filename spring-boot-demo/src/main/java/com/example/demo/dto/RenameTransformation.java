@@ -5,9 +5,13 @@ import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class RenameTransformation extends Transformation {
+public class RenameTransformation {
     private List<String> wcFieldList;
     private String asKeyword;
 }
+/*
+
+json
+"key": {}
+ */

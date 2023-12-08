@@ -10,8 +10,4 @@ public class SpringBootDemoApplication {
         SpringApplication.run(SpringBootDemoApplication.class, args);
     }
 
-    /**
-     * 1. SpringBoot: 15
-     * 2. mybatis: 3
-     */
 }

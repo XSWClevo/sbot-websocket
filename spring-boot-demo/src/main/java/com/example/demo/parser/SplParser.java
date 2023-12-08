@@ -21,15 +21,35 @@ public class SplParser {
         Map<String, Object> transformationConfig = FileOperationUtil.getTransformationConfig();
         FileOperationUtil.mockInsert(transformationConfig);
 
-
         // 模拟请求
         String mockRequest = "source=\"WinEventLog:*\" | stats count(ip) by count";
         String theLastEndStr = getTheLastEndStr(mockRequest);
         String[] strings = theLastEndStr.split(" ");
         int length = strings.length;
         String key = strings[0];
-        Transformation search = trie.search(key);
 
+
+        // 1. eval command 检验
+        Transformation search = trie.search(key);
+        if (verifyTheSearchCommand(length, key, search)) return;
+
+        // 走到这里了，说明eval command 关键字是对的
+        // 2. 现在存在四种情况
+        // 使用map定义出一个规则，map的key等于stats这种关键字，value等于1, 2, 3, 4
+        Integer splSyntaxChoose = SPLSyntaxChooseEnum.getSPLSyntaxType(key);
+
+        // 3. 设置参数
+        SPLSyntaxParam param = setSPLSyntaxParam(splSyntaxChoose, strings);
+
+        // 4. 执行搜索提示逻辑
+        Object apply = SPLSyntaxChooseEnum.getSPLSyntaxChoose(splSyntaxChoose).apply(param);
+        log.info("apply: {}", JSON.toJSONString(apply));
+        log.info("----------------------------------------");
+
+        // top limit=20 referer
+    }
+
+    private static boolean verifyTheSearchCommand(int length, String key, Transformation search) {
         // 这里先使用字典树遍历一次，看看这些keyword 是否需要特殊处理，其实直接字典树查询[0] 号位关键字，
         // 就能得知fun,args是否需要传递
         // 1. 判断传入搜索字符串的规范性
@@ -44,39 +64,15 @@ public class SplParser {
             // 不仅输入了一个关键字
             if (length == 1) {
                 // TODO 命令没有输入完整，这里必须返回 "补全" 的信息
-                return;
+                return true;
             }
         }
-        // 走到这里了，说明eval command 关键字是对的
-        // 2. 现在存在四种情况
-        // 使用map定义出一个规则，map的key等于stats这种关键字，value等于1, 2, 3, 4
-        Integer splSyntaxChoose = SPLSyntaxChooseEnum.getSPLSyntaxType(key);
-
-
-        SPLSyntaxParam param = setSPLSyntaxParam(splSyntaxChoose, strings);
-
-        Object apply = SPLSyntaxChooseEnum.getSPLSyntaxChoose(splSyntaxChoose).apply(param);
-        log.info("apply: {}", JSON.toJSONString(apply));
-        log.info("----------------------------------------");
-        // 2.1 key fun arg
-        // 2.2 key fun
-        // 2.3 key arg
-        // 2.4 key
-
-        // top limit=20 referer
-        for (String keyword : strings) {
-
-        }
-        // Searching for values in the trie
-        SPLSyntaxResult result1 = trie.search("", "abs", "head");
-        SPLSyntaxResult result2 = trie.search("", "sum", "sta");
-        SPLSyntaxResult result3 = trie.search("li", "abs", "head");
-
-        System.out.println("Result 1: " + result1);
-        System.out.println("Result 2: " + result2);
-        System.out.println("Result 3: " + result3);
+        return false;
     }
 
+    /**
+     * 根据不同的类型设置参数
+     */
     private static SPLSyntaxParam setSPLSyntaxParam(Integer type, String[] keys) {
         String evalKey = keys[0];
         SPLSyntaxParam param = new SPLSyntaxParam();
